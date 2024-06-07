@@ -1,0 +1,29 @@
+close all, clear all, clc
+%% Description
+% Code cretated to open data collected in the testbanch
+%% Choosing the directory
+directory = "dataset";
+filesAndFolders = dir(directory);
+filesInDir = filesAndFolders(~([filesAndFolders.isdir]))
+%% Tes code
+batTest = "HPPC";
+numOfFiles = length(filesInDir);
+%% Initialization
+ii = 1;
+kk = 0;
+Qn = 3.08; %Nominal capacity
+%% Open datasets
+while (ii <= numOfFiles-1)
+    fileName = filesInDir(ii).name;
+    if strfind(fileName,batTest) == 8
+        data = load(directory + "\" + fileName);
+        kk = kk+1;
+        t{kk} = data(:,1); % Time
+        vt{kk} = data(:,2); % Terminal voltage
+        it{kk} = data(:,3); % Input current
+        for jj = 1:length(it{kk})
+            soc{kk}
+        end
+    end
+    ii = ii + 1;
+end
