@@ -6,7 +6,7 @@ directory = "dataset";
 filesAndFolders = dir(directory);
 filesInDir = filesAndFolders(~([filesAndFolders.isdir]))
 %% Tes code
-batTest = "RANDCh";
+batTest = "HPPC";
 numOfFiles = length(filesInDir);
 %% Initialization
 ii = 1;
