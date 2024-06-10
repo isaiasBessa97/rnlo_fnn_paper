@@ -52,7 +52,7 @@ for ii = 2:length(t3)
 end
 pa3 = [5 656:652:46296 46947:651:48249];
 pb3 = pa3 + 1;
-pc3 = [58 pa3(2:end) + 54];
+pc3 = [58 pa3(2:end)+54];
 pd3 = pc3 + 1;
 pe3 = pa3 - 1;
 Pp3 = [pa3;pb3;pc3;pd3;pe3];
@@ -66,12 +66,4 @@ for ii = 2:length(t4)
     soc4(ii) = soc4(ii-1) - (1/(3600*Qn))*it4(ii);
 end
 pa4 = [5 656:652:1960 2613:653:48323];
-pb4 = pa4 + 1;
-pc4 = [58 pb4(2:end) + 53];
-pd4 = pc4 + 1;
-pe4 = pa4 - 1;
-Pp4 = [pa4;pb4;pc4;pd4;pe4];
-%% Agrouping data
-Pp = {Pp1,Pp2,Pp3,Pp4}; 
-%% Saving data
-save("DS_001_treatedData","Pp")
+p
