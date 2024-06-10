@@ -72,6 +72,10 @@ pd4 = pc4 + 1;
 pe4 = pa4 - 1;
 Pp4 = [pa4;pb4;pc4;pd4;pe4];
 %% Agrouping data
-Pp = {Pp1,Pp2,Pp3,Pp4}; 
+Pp = {Pp1,Pp2,Pp3,Pp4};
+Tp = {t1(Pp1);t2(Pp2);t3(Pp3);t4(Pp4)};
+Vtp = {vt1(Pp1);vt2(Pp2);vt3(Pp3);vt4(Pp4)};
+Itp = {it1(Pp1);it2(Pp2);it3(Pp3);it4(Pp4)};
+SOCp = {soc1(Pp1);soc2(Pp2);soc3(Pp3);soc4(Pp4)}; 
 %% Saving data
-save("DS_001_treatedData","Pp")
+save("DS_001_treatedData","Pp","Tp","Vtp","Itp","SOCp")
