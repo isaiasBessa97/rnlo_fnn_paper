@@ -20,7 +20,7 @@ for ii = 2:length(t1)
 end
 pa1 = [5 656:652:46948];
 pb1 = pa1+1;
-pc1 = [56 pb1(2:end) + 53];
+pc1 = [58 pb1(2:end) + 53];
 pd1 = pc1 + 1;
 pe1 = pa1 - 1;
 Pp1 = [pa1;pb1;pc1;pd1;pe1];
@@ -72,10 +72,15 @@ pd4 = pc4 + 1;
 pe4 = pa4 - 1;
 Pp4 = [pa4;pb4;pc4;pd4;pe4];
 %% Agrouping data
-Pp = {Pp1,Pp2,Pp3,Pp4};
+Pp = {Pp1;Pp2;Pp3;Pp4};
 Tp = {t1(Pp1);t2(Pp2);t3(Pp3);t4(Pp4)};
 Vtp = {vt1(Pp1);vt2(Pp2);vt3(Pp3);vt4(Pp4)};
 Itp = {it1(Pp1);it2(Pp2);it3(Pp3);it4(Pp4)};
-SOCp = {soc1(Pp1);soc2(Pp2);soc3(Pp3);soc4(Pp4)}; 
+SOCp = {soc1(Pp1);soc2(Pp2);soc3(Pp3);soc4(Pp4)};
+Tt = {t1;t2;t3;t4};
+Vt = {vt1;vt2;vt3;vt4};
+It = {it1;it2;it3;it4};
+SOCt = {soc1;soc2;soc3;soc4};
 %% Saving data
-save("DS_001_treatedData","Pp","Tp","Vtp","Itp","SOCp")
+save("DS_001_treatedData","Pp","Tp","Vtp","Itp","SOCp","Tt","Vt","It",...
+     "SOCt")
