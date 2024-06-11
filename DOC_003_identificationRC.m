@@ -42,8 +42,8 @@ X_voc = soc_sim'.^[ordVoc:-1:0];
 voc_p = pVoc*X_voc';
 %% R1,R2,C1,C2 identifaction setting
 fOpt = fitoptions('Method','NonlinearLeastSquares',...
-                'Lower',[2.2 0 0 0 0],...
-                'Upper',[4.5 1e-3 1e-5 5e1 5e-2],...
+                'Lower',[2.5 0 0 0 0],...
+                'Upper',[4.2 6e-2 6e-2 0.009 0.009],...
                 'StartPoint',[0.7988 0.0027 0.5212 0.7114 0.2222]); %[0.7988 0.0027 0.5212 0.7114 0.2222]
 fTyp = fittype('a0-a1*exp(-b1*x)-a2*exp(-b2*x)','options',fOpt);
 %% R1,R2,C1,C2 identifaction procedure
@@ -52,10 +52,14 @@ for ii = 1:length(Pp)
         Vce = Vt{ii}(Pp{ii}(3,jj):Pp{ii}(5,jj+1));
         tce = linspace(0,length(Vce),length(Vce));
         pVce = fit(tce',Vce,fTyp);
-        V1 = max([pVce.a1 pVce.a2]);
-        V2 = min([pVce.a1 pVce.a2]);
-        tau1 = inv(max([pVce.b1 pVce.b2]));
-        tau2 = inv(min([pVce.b1 pVce.b2]));
+%         V1 = max([pVce.a1 pVce.a2]);
+%         V2 = min([pVce.a1 pVce.a2]);
+%         tau1 = inv(max([pVce.b1 pVce.b2]));
+%         tau2 = inv(min([pVce.b1 pVce.b2]));
+        V1 = pVce.a1;
+        V2 = pVce.a2;
+        tau1 = inv(pVce.b1);
+        tau2 = inv(pVce.b2);
         R1_meas_ce{ii}(jj) = V1/(Itp{ii}(3,jj)*...
             (1-exp(-((Tp{1}(3,1)-Tp{1}(1,1))/tau1))));
         C1_meas_ce{ii}(jj) = tau1/R1_meas_ce{ii}(jj);
