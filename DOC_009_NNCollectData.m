@@ -107,6 +107,7 @@ yTrain_hat = [y2_hat{1} y2_hat{2} y2_hat{3} y2_hat{4}];
 xTrain_hat = [x2_hat{1} x2_hat{2} x2_hat{3} x2_hat{4}];
 psiTrain = [psi{1}' psi{2}' psi{3}' psi{4}'];
 targTrain = [targ{1} targ{2} targ{3} targ{4}];
+
 %% Initial conditions
 % x2_hat(:,1) = [0;0;0.5];
 % ordR0 = length(pR0)-1;
