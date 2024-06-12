@@ -11,17 +11,28 @@ R2 = R2_c;
 C1 = C1_c;
 C2 = C2_c;
 Ts = 1;
+
 a11 = 1-Ts/(R1*C1);
 a22 = 1-Ts/(R2*C2);
 bu1 = Ts/C1;
 bu2 = Ts/C2;
 bu3 = -Ts/(3600*Qn);
+
 A = [a11 0 0;0 a22 0;0 0 1];
 Bu = [bu1;bu2;bu3];
 Du = [-R0];
-nw = sqrt(2);
-Bw = 0.308*Bu;
-Dw = [0.042];
+
+ev = sqrt(2);
+Bv = 0.308*Bu;
+Dv = [0.042];
+
+epsi = 0.02*sqrt(2);
+Bpsi = [0;0;1];
+Dpsi = [0];
+
+Bw = [ev*Bv epsi*Bpsi];
+Dw = [ev*Dv epsi*Dpsi];
+
 Bphi = [0;0;0];
 Dphi = [1];
 
@@ -50,10 +61,10 @@ ak = [1/x1_lim(1) 1/x1_lim(2) 0           0           0           0;
       0           0           1/x2_lim(1) 1/x2_lim(2) 0           0;
       0           0           0           0           1/x3_lim(1) 1/x3_lim(2)];
 %% Parameters settings
-kap = 0.3;
-tau = 1e-2;
-lc = 6e-1;
-P0 = [(2/6e-2)^2 0 0;
+kap2 = 2.3;
+tau2 = 0.01;
+lc2 = 1e-4;
+P02 = [(2/6e-2)^2 0 0;
       0 (2/6e-2)^2 0;
       0 0 (1/0.9)^2];
 %% LMI formulation
@@ -62,26 +73,27 @@ LMIs = [la >= 0] + [mu >= 0] + LMIs;
 LMI1 = [P - la*eye(nx) >= 0];
 LMIs = LMIs + LMI1;
 for ii = 1:size(ak,2)
-    LMI2 = [[1+kap            (1+kap)*ak(:,ii)';
-             (1+kap)*ak(:,ii) P] >= 0];
+    LMI2 = [[1+kap2            (1+kap2)*ak(:,ii)';
+             (1+kap2)*ak(:,ii) P] >= 0];
     LMIs = LMIs + LMI2;
 end
 zxw = zeros(nx,nw);
 zxp = zeros(nx,nphi);
 zwp = zeros(nw,nphi);
 LMI3 = [[P-G-G'          G*A+W*C                  G*Bw+W*Dw      G*Bphi+W*Dphi;
-        (G*A+W*C)'       (tau-1)*P+mu*lc*eye(nx)  zxw            zxp;
-        (G*Bw+W*Dw)'     zxw'                    -tau*eye(nw)    zwp;
+        (G*A+W*C)'       (tau2-1)*P+mu*lc2*eye(nx)  zxw            zxp;
+        (G*Bw+W*Dw)'     zxw'                    -tau2*eye(nw)    zwp;
         (G*Bphi+W*Dphi)' zxp'                     zwp'          -mu*eye(nphi)] <= 0];
-LMI4 = [(1+kap)*P0 - P >= 0];
+LMI4 = [(1+kap2)*P02 - P >= 0];
 LMIs = LMIs + LMI3 +  LMI4;
 %% Solving
 result = optimize(LMIs,-la,options)
-P1 = double(P);
-G1 = double(G);
-W1 = double(W);
-mu1 = double(mu);
-la1 = double(la);
-L1 = -inv(G1)*W1;
+P2 = double(P);
+G2 = double(G);
+W2 = double(W);
+mu2 = double(mu);
+la2 = double(la);
+L2 = -inv(G2)*W2;
 %% Save result
-save("DS_003_rnloGain","P1","G1")
+save("DS_004_rnlonnGain","P2","G2","W2","mu2","la2","L2","P02","kap2",...
+     "lc2","tau2")
