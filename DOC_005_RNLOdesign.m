@@ -28,13 +28,6 @@ Dphi = [1];
 ord = length(pVoc)-1;
 dphi = [ord:-1:1]*(pVoc(1:ord).*0.5.^[ord-1:-1:0])';
 C = [-1 -1 dphi];
-%% Parameters settings
-kap = 0.1;
-tau = 2.9e-3;
-lc = 1e-4;
-P0 = [(1/6e-2)^2 0 0;
-      0 (1/6e-2)^2 0;
-      0 0 (1/0.9)^2];
 %% LMI variables declaration
 nx = size(A,1);
 nu = size(Bu,2);
@@ -56,9 +49,18 @@ x3_lim = [-0.9 0.9];
 ak = [1/x1_lim(1) 1/x1_lim(2) 0           0           0           0;
       0           0           1/x2_lim(1) 1/x2_lim(2) 0           0;
       0           0           0           0           1/x3_lim(1) 1/x3_lim(2)];
+%% Parameters settings
+kap = 0.9;
+tau = 1e-10;
+lc = 1e-20;
+P0 = [(2/6e-2)^2 0 0;
+      0 (2/6e-2)^2 0;
+      0 0 (2/0.9)^2];
 %% LMI formulation
 LMIs = [];
 LMIs = [la >= 0] + [mu >= 0] + LMIs;
+LMI1 = [P - la*eye(nx) >= 0];
+LMIs = LMIs + LMI1;
 for ii = 1:size(ak,2)
     LMI2 = [[1+kap            (1+kap)*ak(:,ii)';
              (1+kap)*ak(:,ii) P] >= 0];
@@ -79,5 +81,6 @@ P = double(P);
 G = double(G);
 W = double(W);
 mu = double(mu);
-la = double(la)
+la = double(la);
 L = -inv(G)*W;
+W'
