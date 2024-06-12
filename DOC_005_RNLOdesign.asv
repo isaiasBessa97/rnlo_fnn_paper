@@ -50,10 +50,10 @@ ak = [1/x1_lim(1) 1/x1_lim(2) 0           0           0           0;
       0           0           1/x2_lim(1) 1/x2_lim(2) 0           0;
       0           0           0           0           1/x3_lim(1) 1/x3_lim(2)];
 %% Parameters settings
-kap1 = 1.3;
-tau1 = 1e-2;
-lc1 = 6e-1;
-P01 = [(2/6e-2)^2 0 0;
+kap = 0.3;
+tau = 1e-2;
+lc = 6e-1;
+P0 = [(2/6e-2)^2 0 0;
       0 (2/6e-2)^2 0;
       0 0 (1/0.9)^2];
 %% LMI formulation
@@ -62,18 +62,18 @@ LMIs = [la >= 0] + [mu >= 0] + LMIs;
 LMI1 = [P - la*eye(nx) >= 0];
 LMIs = LMIs + LMI1;
 for ii = 1:size(ak,2)
-    LMI2 = [[1+kap1            (1+kap1)*ak(:,ii)';
-             (1+kap1)*ak(:,ii) P] >= 0];
+    LMI2 = [[1+kap            (1+kap)*ak(:,ii)';
+             (1+kap)*ak(:,ii) P] >= 0];
     LMIs = LMIs + LMI2;
 end
 zxw = zeros(nx,nw);
 zxp = zeros(nx,nphi);
 zwp = zeros(nw,nphi);
 LMI3 = [[P-G-G'          G*A+W*C                  G*Bw+W*Dw      G*Bphi+W*Dphi;
-        (G*A+W*C)'       (tau1-1)*P+mu*lc1*eye(nx)  zxw            zxp;
-        (G*Bw+W*Dw)'     zxw'                    -tau1*eye(nw)    zwp;
+        (G*A+W*C)'       (tau-1)*P+mu*lc*eye(nx)  zxw            zxp;
+        (G*Bw+W*Dw)'     zxw'                    -tau*eye(nw)    zwp;
         (G*Bphi+W*Dphi)' zxp'                     zwp'          -mu*eye(nphi)] <= 0];
-LMI4 = [(1+kap1)*P01 - P >= 0];
+LMI4 = [(1+kap)*P0 - P >= 0];
 LMIs = LMIs + LMI3 +  LMI4;
 %% Solving
 result = optimize(LMIs,-la,options)
@@ -84,5 +84,4 @@ mu1 = double(mu);
 la1 = double(la);
 L1 = -inv(G1)*W1;
 %% Save result
-save("DS_003_rnloGain","P1","G1","W1","mu1","la1","L1","P01","kap1",...
-     "lc1","tau1")
+save("DS_003_rnloGain","P1","G1")

@@ -41,6 +41,7 @@ end
 Du = [-R0(1)];
 voc(1) = pVoc*(x(3).^[ordR0:-1:0])';
 y(1) = C*x(:,1) + Du*u(1) + voc;
+%% Simulation
 for ii = 2:length(vt)
     x(:,ii) = A*x(:,ii-1)+Bu*u(ii-1);
     if cond == "c"
