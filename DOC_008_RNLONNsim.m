@@ -40,7 +40,7 @@ ord = length(pVoc)-1;
 dphi = [ord:-1:1]*(pVoc(1:ord).*0.5.^[ord-1:-1:0])';
 C = [-1 -1 0];
 %% Loading datas
-data = load("dataset\BID003_HPPC_01062024.xlsx");
+data = load("dataset\BID005_RANDCh_06062024.xlsx");
 nf = length(data);
 vt = data(2:nf-100,2);
 it = data(2:nf-100,3);

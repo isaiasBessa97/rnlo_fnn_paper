@@ -26,7 +26,7 @@ Bphi = [0;0;0];
 Dphi = [1];
 C = [-1 -1 0];
 %% Loading datas
-data = load("dataset\BID005_HPPC_05062024.xlsx");
+data = load("dataset\BID004_HPPC_02062024.xlsx");
 nf = length(data);
 vt = data(2:nf-100,2);
 it = data(2:nf-100,3);
@@ -84,3 +84,5 @@ set(gca,"TickLabelInterpreter","latex","FontSize",16)
 xlabel("Time (s)","FontSize",16,"Interpreter","latex")
 ylabel("SOC","FontSize",16,"Interpreter","latex")
 legend({"Measured","RNLO"},"Fontsize",14,"interpreter","latex")
+%%
+save("DS_007_RNLOresult","y1_hat","x1_hat")

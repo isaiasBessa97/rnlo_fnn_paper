@@ -53,8 +53,8 @@ while (ii <= numOfFiles-1)
         data = load(directory + "\" + fileName);
         nf = length(data);
         kk = kk+1;
-        vt{kk} = data(3:nf-100,2); % Terminal voltage
-        it{kk} = data(3:nf-100,3); % Input current
+        vt{kk} = data(3:nf-600,2); % Terminal voltage
+        it{kk} = data(3:nf-600,3); % Input current
         soc{kk}(1) = 1;
         for jj = 2:length(it{kk})
             soc{kk}(jj) = soc{kk}(jj-1) - (1/(3600*Qn))*it{kk}(jj);
@@ -73,7 +73,7 @@ load("DS_004_rnlonnGain.mat")
 for ii = 1:length(vtTrain)
     u{ii} = itTrain{ii};
     t{ii} = 0:length(u{ii})-1;
-    psi{ii} = epsi*2*(rand(length(itTrain{ii}),1)-0.5)/sqrt(2);
+    psi{ii} = 1*(epsi*2/sqrt(2))*(rand(length(itTrain{ii}),1)-0.5);
     x2_hat{ii}(:,1) = [0;0;0.5];
     targ{ii}(1) = soc{ii}(1)-x2_hat{ii}(3,1);
     ordR0 = length(pR0)-1;
@@ -107,50 +107,6 @@ yTrain_hat = [y2_hat{1} y2_hat{2} y2_hat{3} y2_hat{4}];
 xTrain_hat = [x2_hat{1} x2_hat{2} x2_hat{3} x2_hat{4}];
 psiTrain = [psi{1}' psi{2}' psi{3}' psi{4}'];
 targTrain = [targ{1} targ{2} targ{3} targ{4}];
-
-%% Initial conditions
-% x2_hat(:,1) = [0;0;0.5];
-% ordR0 = length(pR0)-1;
-% cond = "c"; %"c" to R0 constant, "p" to R0 polinomial 
-% if cond == "c"
-%     R0(1) = R0_c;
-% elseif cond == "p"
-%     R0(1) = pR0*(x2_hat(3).^[ordR0:-1:0])';
-% end
-% Du = [-R0(1)];
-% voc2_hat(1) = pVoc*(x2_hat(3).^[ordR0:-1:0])';
-% y2_hat(1) = C*x2_hat(:,1) + Du*u(1) + voc2_hat;
-%% Simulation
-% for ii = 2:length(vt)
-%     x2_hat(:,ii) = A*x2_hat(:,ii-1)+Bu*u(ii-1)+...
-%                    L2*(vt(ii)-y2_hat(ii-1))+Bpsi*psi(ii-1);
-%     if cond == "c"
-%         R0(ii) = R0_c;
-%     elseif cond == "p"
-%         R0(ii) = pR0*(x2_hat(3,ii).^[ordR0:-1:0])';
-%     end    
-%     Du = [-R0(ii)];
-%     voc2_hat(ii) = pVoc*(x2_hat(3,ii).^[ordR0:-1:0])';
-%     y2_hat(ii) = C*x2_hat(:,ii)+Du*u(ii)+voc2_hat(ii);
-% end
-%% Plot results
-% figure()
-% plot(t,vt,"k-","linewidth",2)
-% hold on
-% plot(t,y2_hat,"r-.","linewidth",2)
-% hold off
-% set(gca,"TickLabelInterpreter","latex","FontSize",16)
-% xlabel("Time (s)","FontSize",16,"Interpreter","latex")
-% ylabel("Voltage (V)","FontSize",16,"Interpreter","latex")
-% legend({"Measured","RNLO"},"Fontsize",14,"interpreter","latex")
-% ylim([2.5 4.3])
-% 
-% figure()
-% plot(t,soc,"k-","linewidth",2)
-% hold on
-% plot(t,x2_hat(3,:),"r-.","linewidth",2)
-% hold off
-% set(gca,"TickLabelInterpreter","latex","FontSize",16)
-% xlabel("Time (s)","FontSize",16,"Interpreter","latex")
-% ylabel("Voltage (V)","FontSize",16,"Interpreter","latex")
-% legend({"Measured","RNLO"},"Fontsize",14,"interpreter","latex")
+%% Saving data
+save("DS_005_RNLONN_dataTrain","uTrain","yTrain","yTrain_hat",...
+     "xTrain_hat","psiTrain","targTrain")
