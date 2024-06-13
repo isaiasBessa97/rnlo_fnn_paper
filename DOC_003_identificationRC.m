@@ -21,6 +21,8 @@ R0_meas = [R0_meas_a{1} R0_meas_a{2} R0_meas_a{3} R0_meas_a{4}...
            R0_meas_c{1} R0_meas_c{2} R0_meas_c{3} R0_meas_c{4}];
 soc_R0 = [SOCp{1}(1,:) SOCp{2}(1,:) SOCp{3}(1,:) SOCp{4}(1,:)...
           SOCp{1}(3,:) SOCp{2}(3,:) SOCp{3}(3,:) SOCp{4}(3,:)];
+voc_R0 = [Vtp{1}(1,:) Vtp{2}(1,:) Vtp{3}(1,:) Vtp{4}(1,:)...
+          Vtp{1}(3,:) Vtp{2}(3,:) Vtp{3}(3,:) Vtp{4}(3,:)];
 
 voc_meas = [Vtp{1}(5,:) Vtp{2}(5,:) Vtp{3}(5,:) Vtp{4}(5,:)];
 soc_voc = [SOCp{1}(5,:) SOCp{2}(5,:) SOCp{3}(5,:) SOCp{4}(5,:)];
@@ -29,17 +31,23 @@ soc_voc = [SOCp{1}(5,:) SOCp{2}(5,:) SOCp{3}(5,:) SOCp{4}(5,:)];
 ordR0 = 9;
 R0_c = mean(R0_meas);
 pR0 = polyfit(soc_R0,R0_meas,ordR0);
+pR02 = polyfit(voc_R0,R0_meas,ordR0);
 %% voc identification
 ordVoc = 9;
 pVoc = polyfit(soc_voc,voc_meas,ordVoc);
 %% SOC simulated
-soc_sim = 0.1:0.001:1;
+% soc_sim = 0.1:0.001:1;
+soc_sim = linspace(0.1,1,length(Vt{1}));
 
 X_R0 = soc_sim'.^[ordR0:-1:0];
 R0_p = pR0*X_R0';
 
+
+
 X_voc = soc_sim'.^[ordVoc:-1:0];
 voc_p = pVoc*X_voc';
+
+% R02_p = pR0.*voc_p;
 %% R1,R2,C1,C2 identifaction setting
 fOpt = fitoptions('Method','NonlinearLeastSquares',...
                 'Lower',[2.5 0 0 0 0],...
@@ -88,6 +96,9 @@ set(gca,'TickLabelInterpreter','latex','FontSize',16)
 xlabel("SOC",'Interpreter','latex','FontSize',16)
 ylabel("$R_0$ ($\Omega$)",'Interpreter','latex','FontSize',16)
 legend({"Measured","Poly","Const"},"interpreter","latex","fontsize",14)
+
+
+
 
 figure()
 plot(soc_voc,voc_meas,"rx",'LineWidth',2)

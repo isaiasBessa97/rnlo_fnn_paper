@@ -26,7 +26,7 @@ ev = sqrt(2);
 Bv = 0.308*Bu;
 Dv = [0.042];
 
-epsi = 0.02*sqrt(2);
+epsi = 0.01*sqrt(2);
 Bpsi = [0;0;1];
 Dpsi = [0];
 
@@ -75,7 +75,7 @@ for ii = 1:length(vtTrain)
     t{ii} = 0:length(u{ii})-1;
     psi{ii} = 1*(epsi*2/sqrt(2))*(rand(length(itTrain{ii}),1)-0.5);
     x2_hat{ii}(:,1) = [0;0;0.5];
-    targ{ii}(1) = soc{ii}(1)-x2_hat{ii}(3,1);
+    targ{ii}(1) = socTrain{ii}(1)-x2_hat{ii}(3,1);
     ordR0 = length(pR0)-1;
     cond = "c"; %"c" to R0 constant, "p" to R0 polinomial 
     if cond == "c"
@@ -101,12 +101,18 @@ for ii = 1:length(vtTrain)
         y2_hat{ii}(kk) = C*x2_hat{ii}(:,kk)+Du*u{ii}(kk)+voc2_hat{ii}(kk);
     end 
 end
-uTrain = [u{1}' u{2}' u{3}' u{4}'];
-yTrain = [vtTrain{1}' vtTrain{2}' vtTrain{3}' vtTrain{4}'];
-yTrain_hat = [y2_hat{1} y2_hat{2} y2_hat{3} y2_hat{4}];
-xTrain_hat = [x2_hat{1} x2_hat{2} x2_hat{3} x2_hat{4}];
-psiTrain = [psi{1}' psi{2}' psi{3}' psi{4}'];
-targTrain = [targ{1} targ{2} targ{3} targ{4}];
+% uTrain = [u{1}' u{2}' u{3}' u{4}'];
+% yTrain = [vtTrain{1}' vtTrain{2}' vtTrain{3}' vtTrain{4}'];
+% yTrain_hat = [y2_hat{1} y2_hat{2} y2_hat{3} y2_hat{4}];
+% xTrain_hat = [x2_hat{1} x2_hat{2} x2_hat{3} x2_hat{4}];
+% psiTrain = [psi{1}' psi{2}' psi{3}' psi{4}'];
+% targTrain = [targ{1} targ{2} targ{3} targ{4}];
+uTrain = u;
+yTrain = vtTrain;
+yTrain_hat = y2_hat;
+xTrain_hat = x2_hat;
+psiTrain = psi;
+targTrain = targ;
 %% Saving data
 save("DS_005_RNLONN_dataTrain","uTrain","yTrain","yTrain_hat",...
      "xTrain_hat","psiTrain","targTrain")

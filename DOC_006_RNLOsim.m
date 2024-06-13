@@ -26,7 +26,7 @@ Bphi = [0;0;0];
 Dphi = [1];
 C = [-1 -1 0];
 %% Loading datas
-data = load("dataset\BID004_HPPC_02062024.xlsx");
+data = load("dataset\BID002_HPPC_01062024.xlsx");
 nf = length(data);
 vt = data(2:nf-100,2);
 it = data(2:nf-100,3);

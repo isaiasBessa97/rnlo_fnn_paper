@@ -26,7 +26,7 @@ ev = sqrt(2);
 Bv = 0.308*Bu;
 Dv = [0.042];
 
-epsi = 0.02*sqrt(2);
+epsi = 0.01*sqrt(2);
 Bpsi = [0;0;1];
 Dpsi = [0];
 
@@ -61,9 +61,9 @@ ak = [1/x1_lim(1) 1/x1_lim(2) 0           0           0           0;
       0           0           1/x2_lim(1) 1/x2_lim(2) 0           0;
       0           0           0           0           1/x3_lim(1) 1/x3_lim(2)];
 %% Parameters settings
-kap2 = 2.3;
-tau2 = 0.01;
-lc2 = 1e-4;
+kap2 = 2.0;
+tau2 = 1e-2;
+lc2 = 1e-1;
 P02 = [(2/6e-2)^2 0 0;
       0 (2/6e-2)^2 0;
       0 0 (1/0.9)^2];

@@ -40,7 +40,7 @@ ord = length(pVoc)-1;
 dphi = [ord:-1:1]*(pVoc(1:ord).*0.5.^[ord-1:-1:0])';
 C = [-1 -1 0];
 %% Loading datas
-data = load("dataset\BID005_RANDCh_06062024.xlsx");
+data = load("dataset\BID002_HPPC_01062024.xlsx");
 nf = length(data);
 vt = data(2:nf-100,2);
 it = data(2:nf-100,3);
@@ -53,7 +53,7 @@ load("DS_004_rnlonnGain.mat")
 t = 0:length(vt)-1;
 u = it;
 v = ev*rand(length(t),1);
-psi = epsi*2*(rand(length(t),1)-0.5)/sqrt(2);
+psi = 0*epsi*2*(rand(length(t),1)-0.5)/sqrt(2);
 %% Initial conditions
 x2_hat(:,1) = [0;0;0.5];
 ordR0 = length(pR0)-1;
