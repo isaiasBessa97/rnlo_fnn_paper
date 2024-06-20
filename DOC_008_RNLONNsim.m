@@ -4,6 +4,7 @@ close all, clear all, clc
 % disturbance signal
 %% System declaration
 load("DS_002_RCpar.mat")
+load("DS_004_rnlonnGain.mat")
 Qn = 3.08;
 R0 = R0_c;
 R1 = R1_c;
@@ -22,11 +23,11 @@ A = [a11 0 0;0 a22 0;0 0 1];
 Bu = [bu1;bu2;bu3];
 Du = [-R0];
 
-ev = sqrt(2);
-Bv = 0.308*Bu;
-Dv = [0.042];
+% ev = sqrt(2);
+Bv = 0.0154*Bu;
+Dv = [0.036];
 
-epsi = 0.02*sqrt(2);
+% epsi = 0.01*sqrt(2);
 Bpsi = [0;0;1];
 Dpsi = [0];
 
@@ -40,7 +41,7 @@ ord = length(pVoc)-1;
 dphi = [ord:-1:1]*(pVoc(1:ord).*0.5.^[ord-1:-1:0])';
 C = [-1 -1 0];
 %% Loading datas
-data = load("dataset\BID002_HPPC_01062024.xlsx");
+data = load("dataset\BID003_RANDCh_30052024.xlsx");
 nf = length(data);
 vt = data(2:nf-100,2);
 it = data(2:nf-100,3);
@@ -48,12 +49,13 @@ soc(1) = 1;
 for ii = 2:length(vt)
     soc(ii) = soc(ii-1) - (1/(3600*Qn))*it(ii);
 end
-load("DS_004_rnlonnGain.mat")
 %% Configuring input signals
 t = 0:length(vt)-1;
-u = it;
-v = ev*rand(length(t),1);
-psi = 0*epsi*2*(rand(length(t),1)-0.5)/sqrt(2);
+v = (ev/sqrt(2))*2*(rand(length(t),1)-0.5);
+u = it+0.000*v;
+y = vt+0.001*v;
+psi = 1*0.2*epsi*2*(rand(length(t),1)-0.5)/sqrt(2);
+
 %% Initial conditions
 x2_hat(:,1) = [0;0;0.5];
 ordR0 = length(pR0)-1;
@@ -69,7 +71,7 @@ y2_hat(1) = C*x2_hat(:,1) + Du*u(1) + voc2_hat;
 %% Simulation
 for ii = 2:length(vt)
     x2_hat(:,ii) = A*x2_hat(:,ii-1)+Bu*u(ii-1)+...
-                   L2*(vt(ii-1)-y2_hat(ii-1))+Bpsi*psi(ii-1);
+                   L2*(y(ii-1)-y2_hat(ii-1))+Bpsi*psi(ii-1);
     if cond == "c"
         R0(ii) = R0_c;
     elseif cond == "p"
@@ -79,6 +81,7 @@ for ii = 2:length(vt)
     voc2_hat(ii) = pVoc*(x2_hat(3,ii).^[ordR0:-1:0])';
     y2_hat(ii) = C*x2_hat(:,ii)+Du*u(ii)+voc2_hat(ii);
 end
+targSig = soc - x2_hat(3,:);
 %% Plot results
 figure()
 plot(t,vt,"k-","linewidth",2)
@@ -100,3 +103,11 @@ set(gca,"TickLabelInterpreter","latex","FontSize",16)
 xlabel("Time (s)","FontSize",16,"Interpreter","latex")
 ylabel("SOC","FontSize",16,"Interpreter","latex")
 legend({"Measured","RNLO"},"Fontsize",14,"interpreter","latex")
+ylim([0 1])
+
+figure()
+plot(t,targSig,"k-","linewidth",2)
+set(gca,"TickLabelInterpreter","latex","FontSize",16)
+xlabel("Time (s)","FontSize",16,"Interpreter","latex")
+ylabel("$\psi$","FontSize",16,"Interpreter","latex")
+ylim([-epsi/sqrt(2) epsi/sqrt(2)])

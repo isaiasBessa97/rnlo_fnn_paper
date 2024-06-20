@@ -22,9 +22,9 @@ A = [a11 0 0;0 a22 0;0 0 1];
 Bu = [bu1;bu2;bu3];
 Du = [-R0];
 
-ev = sqrt(2);
-Bv = 0.308*Bu;
-Dv = [0.042];
+ev = 1*sqrt(2);
+Bv = 0.0308*Bu;
+Dv = [0.036];
 
 epsi = 0.01*sqrt(2);
 Bpsi = [0;0;1];
@@ -53,17 +53,17 @@ mu = sdpvar(1,1);
 la = sdpvar(1,1);
 options = sdpsettings('verbose',0,'solver','mosek');
 %% Constraints
-x1_lim = [-6e-2 6e-2];
-x2_lim = [-6e-2 6e-2];
+x1_lim = [-6e-1 6e-1];
+x2_lim = [-6e-1 6e-1];
 x3_lim = [-0.9 0.9];
 
 ak = [1/x1_lim(1) 1/x1_lim(2) 0           0           0           0;
       0           0           1/x2_lim(1) 1/x2_lim(2) 0           0;
       0           0           0           0           1/x3_lim(1) 1/x3_lim(2)];
 %% Parameters settings
-kap2 = 2.0;
+kap2 = 3;
 tau2 = 1e-2;
-lc2 = 1e-1;
+lc2 = 2e-2;
 P02 = [(2/6e-2)^2 0 0;
       0 (2/6e-2)^2 0;
       0 0 (1/0.9)^2];
@@ -96,4 +96,4 @@ la2 = double(la);
 L2 = -inv(G2)*W2;
 %% Save result
 save("DS_004_rnlonnGain","P2","G2","W2","mu2","la2","L2","P02","kap2",...
-     "lc2","tau2")
+     "lc2","tau2","ev","epsi")

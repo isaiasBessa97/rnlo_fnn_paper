@@ -19,14 +19,14 @@ bu3 = -Ts/(3600*Qn);
 A = [a11 0 0;0 a22 0;0 0 1];
 Bu = [bu1;bu2;bu3];
 Du = [-R0];
-nw = sqrt(2);
+ev = sqrt(2);
 Bw = 0.308*Bu;
 Dw = [0.042];
 Bphi = [0;0;0];
 Dphi = [1];
 C = [-1 -1 0];
 %% Loading datas
-data = load("dataset\BID002_HPPC_01062024.xlsx");
+data = load("dataset\BID003_RANDCh_30052024.xlsx");
 nf = length(data);
 vt = data(2:nf-100,2);
 it = data(2:nf-100,3);
@@ -37,8 +37,9 @@ end
 load("DS_003_rnloGain.mat")
 %% Configuring input signals
 t = 0:length(vt)-1;
-u = it;
-w = nw*rand(length(t),1);
+v = (ev/sqrt(2))*2*(rand(length(t),1)-0.5);
+u = it+0.01*v;
+y = vt+0.01*v;
 %% Initial conditions
 x1_hat(:,1) = [0;0;0.5];
 ordR0 = length(pR0)-1;
@@ -52,8 +53,8 @@ Du = [-R0(1)];
 voc1_hat(1) = pVoc*(x1_hat(3).^[ordR0:-1:0])';
 y1_hat(1) = C*x1_hat(:,1) + Du*u(1) + voc1_hat;
 %% Simulation
-for ii = 2:length(vt)
-    x1_hat(:,ii) = A*x1_hat(:,ii-1)+Bu*u(ii-1)+L1*(vt(ii-1)-y1_hat(ii-1));
+for ii = 2:length(y)
+    x1_hat(:,ii) = A*x1_hat(:,ii-1)+Bu*u(ii-1)+L1*(y(ii-1)-y1_hat(ii-1));
     if cond == "c"
         R0(ii) = R0_c;
     elseif cond == "p"
@@ -65,7 +66,7 @@ for ii = 2:length(vt)
 end
 %% Plot results
 figure()
-plot(t,vt,"k-","linewidth",2)
+plot(t,y,"k-","linewidth",2)
 hold on
 plot(t,y1_hat,"r-.","linewidth",2)
 hold off
@@ -86,3 +87,4 @@ ylabel("SOC","FontSize",16,"Interpreter","latex")
 legend({"Measured","RNLO"},"Fontsize",14,"interpreter","latex")
 %%
 save("DS_007_RNLOresult","y1_hat","x1_hat")
+save("DS_disturb","v")

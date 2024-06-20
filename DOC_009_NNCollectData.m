@@ -4,6 +4,7 @@ close all, clear all, clc
 % disturbance signal
 %% System declaration
 load("DS_002_RCpar.mat")
+load("DS_004_rnlonnGain.mat")
 Qn = 3.08;
 R0 = R0_c;
 R1 = R1_c;
@@ -22,11 +23,11 @@ A = [a11 0 0;0 a22 0;0 0 1];
 Bu = [bu1;bu2;bu3];
 Du = [-R0];
 
-ev = sqrt(2);
-Bv = 0.308*Bu;
-Dv = [0.042];
+% ev = sqrt(2);
+Bv = 0.0154*Bu;
+Dv = [0.036];
 
-epsi = 0.01*sqrt(2);
+% epsi = 0.001*sqrt(2);
 Bpsi = [0;0;1];
 Dpsi = [0];
 
@@ -62,18 +63,22 @@ while (ii <= numOfFiles-1)
     end
     ii = ii + 1;
 end
+% vtTrain = {vt{1}(1:27800);vt{2};vt{3}(1:22700);vt{5}(1:27700)};
+% itTrain = {it{1}(1:27800);it{2};it{3}(1:22700);it{5}(1:27700)};
+% socTrain = {soc{1}(1:27800);soc{2};soc{3}(1:22700);soc{5}(1:27700)};
 vtTrain = {vt{1};vt{2};vt{3};vt{5}};
 itTrain = {it{1};it{2};it{3};it{5}};
 socTrain = {soc{1};soc{2};soc{3};soc{5}};
 vtTest = {vt{4};vt{6}};
 itTest = {it{4};it{6}};
 socTest = {soc{4};soc{6}};
-load("DS_004_rnlonnGain.mat")
 %% Collecting training data
 for ii = 1:length(vtTrain)
-    u{ii} = itTrain{ii};
+    v{ii} = (ev/sqrt(2))*2*rand(length(vtTrain{ii}),1);
+    u{ii} = itTrain{ii}+0.01*v{ii};
+    y{ii} = vtTrain{ii}+0.01*v{ii};
     t{ii} = 0:length(u{ii})-1;
-    psi{ii} = 1*(epsi*2/sqrt(2))*(rand(length(itTrain{ii}),1)-0.5);
+    psi{ii} = 0.1*2*(epsi/sqrt(2))*(rand(length(itTrain{ii}),1)-0.5);
     x2_hat{ii}(:,1) = [0;0;0.5];
     targ{ii}(1) = socTrain{ii}(1)-x2_hat{ii}(3,1);
     ordR0 = length(pR0)-1;
@@ -89,7 +94,7 @@ for ii = 1:length(vtTrain)
     for kk = 2:length(vtTrain{ii})
         x2_hat{ii}(:,kk) = A*x2_hat{ii}(:,kk-1)+Bu*u{ii}(kk-1)+ ...
                        L2*(vtTrain{ii}(kk-1)-y2_hat{ii}(kk-1))+ ...
-                       Bpsi*psi{ii}(kk-1);
+                       Bpsi*psi{ii}(kk);
         targ{ii}(kk) = socTrain{ii}(kk)-x2_hat{ii}(3,kk);
         if cond == "c"
             R0(kk) = R0_c;

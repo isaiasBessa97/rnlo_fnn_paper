@@ -1,6 +1,7 @@
 close all, clear all, clc
 %% Loading data
-data = load("dataset\BID004_RANDCh_30052024.xlsx");
+c1 = [001 156 225]/255;
+data = load("dataset\BID001_HPPC_31052024.xlsx");
 N = length(data);
 vt = data(2:N-60,2)';
 it = data(2:N-60,3)';
@@ -33,13 +34,14 @@ B = [b1;
      b2;
      b3];
 %% Initialization
+w = 2*(rand(1,length(vt))-0.5); %Noise
 u(1) = it(1);
-x_hat(:,1) = [0;0;0.5];
+x_hat(:,1) = [0;0;0.50];
 R0_hat(1) = pR0*((x_hat(3,1)).^[Np:-1:0])';
 voc_hat(1) = pVoc*((x_hat(3,1)).^[Np:-1:0])';
 y_hat(1) = -x_hat(1,1)-x_hat(2,1)-R0_hat(1)*u(1)+voc_hat(1);
 
-P{1} = [0.001 0 0;0 0.001 0;0 0 0.1];
+P{1} = [0.001 0 0;0 0.001 0;0 0 0.01]; %0.1
 R = 0.2;
 Q = 1e-6*eye(3);
 In = eye(size(A,1));
@@ -48,8 +50,8 @@ x_ext(:,1) = A*x_hat(:,1) + B*u(1);
 P_ext{1} = A*P{1}*A' + Q;
 for kk = 2:length(it)
     %% Measure
-    z(kk) = vt(kk);
-    u(kk) = it(kk);
+    z(kk) = vt(kk)+0.03*w(kk);
+    u(kk) = it(kk)+0.03*w(kk);
     %% Update/Correction
     dR0(kk-1) = pdR0*((x_ext(3,kk-1)).^[Np-1:-1:0])';
     dVoc(kk-1) = pdVoc*((x_ext(3,kk-1)).^[Np-1:-1:0])';
@@ -61,7 +63,7 @@ for kk = 2:length(it)
     K{kk} = P_ext{kk-1}*C'*inv(C*P_ext{kk-1}*C'+R);
     x_hat(:,kk) = x_ext(:,kk-1) + K{kk}*(z(kk)-g(kk));
     P{kk} = (In-K{kk}*C)*P_ext{kk-1}*(In-K{kk}*C)'+K{kk}*R*K{kk}';
-
+    tP(kk) = trace(P{kk});
 
     R0_hat(kk) = pR0*((x_hat(3,kk)).^[Np:-1:0])';
     voc_hat(kk) = pVoc*((x_hat(3,kk)).^[Np:-1:0])';
@@ -69,6 +71,7 @@ for kk = 2:length(it)
     %% Extrapolation/Prediction
     x_ext(:,kk) = A*x_hat(:,kk) + B*u(kk);
     P_ext{kk} = A*P{kk}*A' + Q;
+
 end
 %% Plot results
 figure()
@@ -80,24 +83,40 @@ ylabel("Current (A)","Interpreter","latex","FontSize",16)
 xlabel("Time (s)","Interpreter","latex","FontSize",16)
 
 figure()
-plot(t,vt,"k-","linewidth",2)
+plot(t,z,"k-","linewidth",2)
 hold on
-plot(t,y_hat,"b:","linewidth",2)
+plot(t,y_hat,"-","linewidth",3,"Color",c1)
 hold off
 ylim([2.5 4.3])
 xlim([0 length(it)])
-set(gca,"TickLabelInterpreter","latex","FontSize",16)
-ylabel("Voltage (V)","Interpreter","latex","FontSize",16)
-xlabel("Time (s)","Interpreter","latex","FontSize",16)
-legend({})
+set(gca,"TickLabelInterpreter","latex","FontSize",20)
+ylabel("Voltage (V)","Interpreter","latex","FontSize",20)
+xlabel("Time (s)","Interpreter","latex","FontSize",20)
+legend({"Measured","Esimated"},"interpreter","latex","fontsize",16)
+indexOfInterest = (t >= 0) & (t <= 400);
+axes('Position',[.24 .26 .24 .24])
+plot(t(indexOfInterest),z(indexOfInterest),"k-","linewidth",2)
+hold on
+plot(t(indexOfInterest),y_hat(indexOfInterest),":","linewidth",2,"Color",c1)
+hold off
+set(gca,'ticklabelinterpreter','latex','fontsize',16)
 
 figure()
 plot(t,soc,"k-","linewidth",2)
 hold on
-plot(t,x_hat(3,:),"b:","linewidth",2)
+plot(t,x_hat(3,:),":","linewidth",2,"Color",c1)
 hold off
 ylim([0 1])
 xlim([0 length(it)])
-set(gca,"TickLabelInterpreter","latex","FontSize",16)
-ylabel("SOC","Interpreter","latex","FontSize",16)
-xlabel("Time (s)","Interpreter","latex","FontSize",16)
+set(gca,"TickLabelInterpreter","latex","FontSize",20)
+ylabel("SOC","Interpreter","latex","FontSize",20)
+xlabel("Time (s)","Interpreter","latex","FontSize",20)
+legend({"Measured","Esimated"},"interpreter","latex","fontsize",16)
+axes('Position',[.24 .35 .24 .24])
+indexOfInterest = (t >= 0) & (t <= 400);
+plot(t(indexOfInterest),soc(indexOfInterest),"k-","linewidth",2)
+hold on
+plot(t(indexOfInterest),x_hat(3,indexOfInterest),":","linewidth",2,"Color",c1)
+hold off
+set(gca,'ticklabelinterpreter','latex','fontsize',16)
+ylim([0 1.2])

@@ -1,6 +1,7 @@
 close all, clear all, clc
 %% System declaration
 load("DS_002_RCpar.mat")
+load("DS_004_rnlonnGain.mat")
 Qn = 3.08;
 R0 = R0_c;
 R1 = R1_c;
@@ -19,11 +20,11 @@ A = [a11 0 0;0 a22 0;0 0 1];
 Bu = [bu1;bu2;bu3];
 Du = [-R0];
 
-ev = sqrt(2);
+% ev = sqrt(2);
 Bv = 0.308*Bu;
 Dv = [0.042];
 
-epsi = 0.01*sqrt(2);
+% epsi = 0.01*sqrt(2);
 Bpsi = [0;0;1];
 Dpsi = [0];
 
@@ -40,7 +41,8 @@ C = [-1 -1 0];
 load("DS_006_modelFNN_v0.mat")
 load("DS_004_rnlonnGain.mat")
 load("DS_007_RNLOresult.mat")
-data = load("dataset\BID002_HPPC_01062024.xlsx");
+load("DS_disturb.mat")
+data = load("dataset\BID003_RANDCh_30052024.xlsx");
 nf = length(data);
 vt = data(2:nf-100,2);
 it = data(2:nf-100,3);
@@ -50,7 +52,8 @@ for ii = 2:length(vt)
 end
 %% Configuring input signals
 t = 0:length(vt)-1;
-u = it;
+u = it + 0.005*v;
+y = vt + 0.005*v;
 %% Initial conditions
 x3_hat(:,1) = [0;0;0.5];
 ordR0 = length(pR0)-1;
@@ -67,18 +70,14 @@ y3_hat(1) = C*x3_hat(:,1) + Du*u(1) + voc3_hat;
 for ii = 2:length(vt)
     if ii-m > 0
         ub(1:m+d) = u(ii:-1:ii-m);
-        yb(1:m+d) = vt(ii:-1:ii-m);
-%         x1b_c(1:m) = x3_hat(1,ii-d:-1:ii-m);
-%         x2b_c(1:m) = x3_hat(2,ii-d:-1:ii-m);
+        yb(1:m+d) = y(ii:-1:ii-m);
         x3b_c(1:m) = x3_hat(3,ii-d:-1:ii-m);
         yb_c(1:m) = y3_hat(ii-d:-1:ii-m);
         pcb(1:m) = psi(ii-d:-1:ii-m);
 
-%         pc_cell = net({[ub';yb';x1b_c';x2b_c';x3b_c';yb_c';pcb']});
         pc_cell = net({[ub';yb';x3b_c';yb_c';pcb']});
-%         pc_cell = net({[ub';yb';x3b_c';yb_c']});
         psi(ii) = pc_cell{1}(1);
-        kMax = 1*(epsi/sqrt(2));
+        kMax = 2*(epsi/sqrt(2));
         if (psi(ii) >= kMax) || (psi(ii) <= -kMax) 
             if psi(ii) >= kMax
                 psi(ii) = kMax;
@@ -93,7 +92,7 @@ for ii = 2:length(vt)
     end
 
     x3_hat(:,ii) = A*x3_hat(:,ii-1)+Bu*u(ii-1)+...
-                   L2*(vt(ii-1)-y3_hat(ii-1))+Bpsi*psi(ii-1);
+                   L2*(y(ii-1)-y3_hat(ii-1))+Bpsi*psi(ii);
     if cond == "c"
         R0(ii) = R0_c;
     elseif cond == "p"
@@ -115,7 +114,7 @@ hold off
 set(gca,"TickLabelInterpreter","latex","FontSize",16)
 xlabel("Time (s)","FontSize",16,"Interpreter","latex")
 ylabel("Voltage (V)","FontSize",16,"Interpreter","latex")
-legend({"Measured","RNLO","RNLO+NN"},"Fontsize",14,"interpreter","latex")
+legend({"Measured","NLO","NLO+NN"},"Fontsize",14,"interpreter","latex")
 ylim([2.5 4.3])
 
 figure()

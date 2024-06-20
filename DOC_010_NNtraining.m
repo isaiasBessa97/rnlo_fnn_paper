@@ -3,7 +3,7 @@ close all, clear all, clc
 load("DS_005_RNLONN_dataTrain.mat")
 %% Dataset configuration
 d = 1; % delay size
-m = 7; % buffer size
+m = 9; % buffer size
 for ii = 1:length(uTrain)
     n = length(uTrain{ii}); %original size input
     for jj = 1+m:n
@@ -30,11 +30,13 @@ end
 %Network structure
 net = feedforwardnet([5],'trainlm');
 %Output activation function
-net.layers{2}.transferFcn = 'tansig'
-net.layers{1}.transferFcn = 'purelin'
+net.layers{2}.transferFcn = 'tansig';
+net.layers{1}.transferFcn = 'purelin';
 %Setting parameters
 net.trainParam.min_grad = 1e-15;
 net.trainParam.goal = 1e-8;
+net.trainParam.mu_max = 1e20;
+net.trainParam.mu = 1e-8;
 net.trainParam.epochs = 500;
 %Train network
 net = train(net,X,T);
