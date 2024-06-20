@@ -26,7 +26,7 @@ ev = 1*sqrt(2);
 Bv = 0.0308*Bu;
 Dv = [0.036];
 
-epsi = 0.01*sqrt(2);
+epsi = 0.02*sqrt(2);
 Bpsi = [0;0;1];
 Dpsi = [0];
 
