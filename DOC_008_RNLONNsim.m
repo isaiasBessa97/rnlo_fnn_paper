@@ -2,7 +2,7 @@ close all, clear all, clc
 %% Description
 % Script developed to design an observer gain L ISS with respect to
 % disturbance signal
-%% System declaration
+%% System declaration 
 load("DS_002_RCpar.mat")
 load("DS_004_rnlonnGain.mat")
 Qn = 3.08;
@@ -41,7 +41,7 @@ ord = length(pVoc)-1;
 dphi = [ord:-1:1]*(pVoc(1:ord).*0.5.^[ord-1:-1:0])';
 C = [-1 -1 0];
 %% Loading datas
-data = load("dataset\BID003_RANDCh_30052024.xlsx");
+data = load("dataset\BID003_HPPC_01062024.xlsx");
 nf = length(data);
 vt = data(2:nf-100,2);
 it = data(2:nf-100,3);
@@ -52,10 +52,9 @@ end
 %% Configuring input signals
 t = 0:length(vt)-1;
 v = (ev/sqrt(2))*2*(rand(length(t),1)-0.5);
-u = it+0.000*v;
-y = vt+0.001*v;
-psi = 1*0.2*epsi*2*(rand(length(t),1)-0.5)/sqrt(2);
-
+u = it+0.01*v;
+y = vt+0.01*v;
+psi = 0.01*epsi*2*(rand(length(t),1)-0.5)/sqrt(2);
 %% Initial conditions
 x2_hat(:,1) = [0;0;0.5];
 ordR0 = length(pR0)-1;
@@ -82,9 +81,16 @@ for ii = 2:length(vt)
     y2_hat(ii) = C*x2_hat(:,ii)+Du*u(ii)+voc2_hat(ii);
 end
 targSig = soc - x2_hat(3,:);
+% for ii=1:length(targSig)
+%     if(targSig(ii)>epsi/sqrt(2))
+%         targSig(ii) = epsi/sqrt(2);
+%     elseif(targSig(ii)<-epsi/sqrt(2))
+%         targSig(ii) = -epsi/sqrt(2);
+%     end
+% end
 %% Plot results
 figure()
-plot(t,vt,"k-","linewidth",2)
+plot(t,y,"k-","linewidth",2)
 hold on
 plot(t,y2_hat,"r-.","linewidth",2)
 hold off
@@ -98,11 +104,12 @@ figure()
 plot(t,soc,"k-","linewidth",2)
 hold on
 plot(t,x2_hat(3,:),"r-.","linewidth",2)
+plot(t,x2_hat(3,:)+targSig,"b:","linewidth",2)
 hold off
 set(gca,"TickLabelInterpreter","latex","FontSize",16)
 xlabel("Time (s)","FontSize",16,"Interpreter","latex")
 ylabel("SOC","FontSize",16,"Interpreter","latex")
-legend({"Measured","RNLO"},"Fontsize",14,"interpreter","latex")
+legend({"Measured","RNLO","with correction"},"Fontsize",14,"interpreter","latex")
 ylim([0 1])
 
 figure()

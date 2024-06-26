@@ -22,11 +22,11 @@ A = [a11 0 0;0 a22 0;0 0 1];
 Bu = [bu1;bu2;bu3];
 Du = [-R0];
 
-ev = 1*sqrt(2);
-Bv = 0.0308*Bu;
+ev = 1.0*sqrt(2);
+Bv = 0.0154*Bu;
 Dv = [0.036];
 
-epsi = 0.02*sqrt(2);
+epsi = 0.01*sqrt(2);
 Bpsi = [0;0;1];
 Dpsi = [0];
 
@@ -50,31 +50,31 @@ P = sdpvar(nx,nx,'sym');
 G = sdpvar(nx,nx,'full');
 W = sdpvar(nx,ny);
 mu = sdpvar(1,1);
-la = sdpvar(1,1);
+kap = sdpvar(1,1);
 options = sdpsettings('verbose',0,'solver','mosek');
 %% Constraints
-x1_lim = [-6e-1 6e-1];
-x2_lim = [-6e-1 6e-1];
+x1_lim = [-1e-1 1e-1];
+x2_lim = [-1e-1 1e-1];
 x3_lim = [-0.9 0.9];
 
 ak = [1/x1_lim(1) 1/x1_lim(2) 0           0           0           0;
       0           0           1/x2_lim(1) 1/x2_lim(2) 0           0;
       0           0           0           0           1/x3_lim(1) 1/x3_lim(2)];
 %% Parameters settings
-kap2 = 3;
-tau2 = 1e-2;
-lc2 = 2e-2;
-P02 = [(2/6e-2)^2 0 0;
-      0 (2/6e-2)^2 0;
-      0 0 (1/0.9)^2];
+la2 = 1.3;
+tau2 = 1.29e-2;
+lc2 = 16e-3;
+P02 = [(4/x1_lim(2))^2 0 0;
+       0 (4/x2_lim(2))^2 0;
+       0 0 (4/x3_lim(2))^2];
 %% LMI formulation
 LMIs = [];
-LMIs = [la >= 0] + [mu >= 0] + LMIs;
-LMI1 = [P - la*eye(nx) >= 0];
+LMIs = [kap >= 0] + [mu >= 0] + LMIs;
+LMI1 = [P - la2*eye(nx) >= 0];
 LMIs = LMIs + LMI1;
 for ii = 1:size(ak,2)
-    LMI2 = [[1+kap2            (1+kap2)*ak(:,ii)';
-             (1+kap2)*ak(:,ii) P] >= 0];
+    LMI2 = [[1+kap            (1+kap)*ak(:,ii)';
+             (1+kap)*ak(:,ii) P] >= 0];
     LMIs = LMIs + LMI2;
 end
 zxw = zeros(nx,nw);
@@ -84,16 +84,16 @@ LMI3 = [[P-G-G'          G*A+W*C                  G*Bw+W*Dw      G*Bphi+W*Dphi;
         (G*A+W*C)'       (tau2-1)*P+mu*lc2*eye(nx)  zxw            zxp;
         (G*Bw+W*Dw)'     zxw'                    -tau2*eye(nw)    zwp;
         (G*Bphi+W*Dphi)' zxp'                     zwp'          -mu*eye(nphi)] <= 0];
-LMI4 = [(1+kap2)*P02 - P >= 0];
+LMI4 = [(1+kap)*P02 - P >= 0];
 LMIs = LMIs + LMI3 +  LMI4;
 %% Solving
-result = optimize(LMIs,-la,options)
+result = optimize(LMIs,-kap,options)
 P2 = double(P);
 G2 = double(G);
 W2 = double(W);
 mu2 = double(mu);
-la2 = double(la);
-L2 = -inv(G2)*W2;
+kap2 = double(kap)
+L2 = -inv(G2)*W2
 %% Save result
 save("DS_004_rnlonnGain","P2","G2","W2","mu2","la2","L2","P02","kap2",...
      "lc2","tau2","ev","epsi")

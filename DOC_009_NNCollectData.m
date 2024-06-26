@@ -66,19 +66,16 @@ end
 % vtTrain = {vt{1}(1:27800);vt{2};vt{3}(1:22700);vt{5}(1:27700)};
 % itTrain = {it{1}(1:27800);it{2};it{3}(1:22700);it{5}(1:27700)};
 % socTrain = {soc{1}(1:27800);soc{2};soc{3}(1:22700);soc{5}(1:27700)};
-vtTrain = {vt{1};vt{2};vt{3};vt{5}};
-itTrain = {it{1};it{2};it{3};it{5}};
-socTrain = {soc{1};soc{2};soc{3};soc{5}};
-vtTest = {vt{4};vt{6}};
-itTest = {it{4};it{6}};
-socTest = {soc{4};soc{6}};
+vtTrain = {vt{1};vt{2};vt{3};vt{4};vt{5};vt{6}};
+itTrain = {it{1};it{2};it{3};it{4};it{5};it{6}};
+socTrain = {soc{1};soc{2};soc{3};soc{4};soc{5};soc{6}};
 %% Collecting training data
 for ii = 1:length(vtTrain)
-    v{ii} = (ev/sqrt(2))*2*rand(length(vtTrain{ii}),1);
+    v{ii} = (ev/sqrt(2))*2*(rand(length(vtTrain{ii}),1)-0.5);
     u{ii} = itTrain{ii}+0.01*v{ii};
     y{ii} = vtTrain{ii}+0.01*v{ii};
     t{ii} = 0:length(u{ii})-1;
-    psi{ii} = 0.1*2*(epsi/sqrt(2))*(rand(length(itTrain{ii}),1)-0.5);
+    psi{ii} = 1*2*(epsi/sqrt(2))*(rand(length(itTrain{ii}),1)-0.5);
     x2_hat{ii}(:,1) = [0;0;0.5];
     targ{ii}(1) = socTrain{ii}(1)-x2_hat{ii}(3,1);
     ordR0 = length(pR0)-1;
@@ -96,6 +93,13 @@ for ii = 1:length(vtTrain)
                        L2*(vtTrain{ii}(kk-1)-y2_hat{ii}(kk-1))+ ...
                        Bpsi*psi{ii}(kk);
         targ{ii}(kk) = socTrain{ii}(kk)-x2_hat{ii}(3,kk);
+
+%         if(targ{ii}(kk)>epsi/sqrt(2))
+%             targ{ii}(kk) = epsi/sqrt(2);
+%         elseif(targ{ii}(kk)<-epsi/sqrt(2))
+%             targ{ii}(kk)=-epsi/sqrt(2);
+%         end
+
         if cond == "c"
             R0(kk) = R0_c;
         elseif cond == "p"
@@ -106,18 +110,14 @@ for ii = 1:length(vtTrain)
         y2_hat{ii}(kk) = C*x2_hat{ii}(:,kk)+Du*u{ii}(kk)+voc2_hat{ii}(kk);
     end 
 end
-% uTrain = [u{1}' u{2}' u{3}' u{4}'];
-% yTrain = [vtTrain{1}' vtTrain{2}' vtTrain{3}' vtTrain{4}'];
-% yTrain_hat = [y2_hat{1} y2_hat{2} y2_hat{3} y2_hat{4}];
-% xTrain_hat = [x2_hat{1} x2_hat{2} x2_hat{3} x2_hat{4}];
-% psiTrain = [psi{1}' psi{2}' psi{3}' psi{4}'];
-% targTrain = [targ{1} targ{2} targ{3} targ{4}];
-uTrain = u;
-yTrain = vtTrain;
-yTrain_hat = y2_hat;
-xTrain_hat = x2_hat;
-psiTrain = psi;
-targTrain = targ;
+
+uTrain = {u{1}(1:28826) u{2} u{3}(1:22812) u{4}(1:25190) u{5}(1:30083) u{6}(1:32047)};
+yTrain = {vtTrain{1}(1:28826) vtTrain{2} vtTrain{3}(1:22812) vtTrain{4}(1:25190) vtTrain{5}(1:30083) vtTrain{6}(1:32047)};
+yTrain_hat = {y2_hat{1}(1:28826) y2_hat{2} y2_hat{3}(1:22812) y2_hat{4}(1:25190) y2_hat{5}(1:30083) y2_hat{6}(1:32047)};
+xTrain_hat = {x2_hat{1}(:,1:28826) x2_hat{2} x2_hat{3}(:,1:22812) x2_hat{4}(:,1:25190) x2_hat{5}(:,1:30083) x2_hat{6}(:,1:32047)};
+vocTrain_hat = {voc2_hat{1}(1:28826) voc2_hat{2} voc2_hat{3}(1:22812) voc2_hat{4}(1:25190) voc2_hat{5}(1:30083) voc2_hat{6}(1:32047)};
+psiTrain = {psi{1}(1:28826) psi{2} psi{3}(1:22812) psi{4}(1:25190) psi{5}(1:30083) psi{6}(1:32047)};
+targTrain = {targ{1}(1:28826) targ{2} targ{3}(1:22812) targ{4}(1:25190) targ{5}(1:30083) targ{6}(1:32047)};
 %% Saving data
 save("DS_005_RNLONN_dataTrain","uTrain","yTrain","yTrain_hat",...
-     "xTrain_hat","psiTrain","targTrain")
+     "xTrain_hat","vocTrain_hat","psiTrain","targTrain")
